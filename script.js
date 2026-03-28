@@ -39,6 +39,7 @@ function startGame(level) {
     levelSelection.style.display = "none";
     gameScreen.style.display = "block";
     backgroundMusic.play();
+    textBox.focus();
 
     game.init();
 }
