@@ -1,31 +1,26 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Typing Game</title>
+  <head>
+    <title>Type words</title>
     <link rel="stylesheet" href="style.css">
-</head>
-<body>
-    <div class="game-container">
-        <div id="level-selection">
-            <h1>Choose Your Level</h1>
-            <button id="easy-btn">Easy</button>
-            <button id="medium-btn">Medium</button>
-            <button id="hard-btn">Hard</button>
-        </div>
-        <div id="game-screen" style="display: none;">
-            <div id="word-display"></div>
-            <input type="text" id="word-input" autofocus>
-            <div id="timer">Time: 60</div>
-            <div id="score">Score: 0</div>
-        </div>
-        <div id="game-over-screen" style="display: none;">
-            <h1>Game Over</h1>
-            <p>Final Score: <span id="final-score"></span></p>
-            <button id="play-again-btn">Play Again</button>
-        </div>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+  </head>
+  <body>
+    <div id="level-selection">
+        <h1>Choose Your Level</h1>
+        <button id="easy-btn">Easy</button>
+        <button id="medium-btn">Medium</button>
+        <button id="hard-btn">Hard</button>
     </div>
+    <!-- Game canvas -->
+    <canvas id="canvas" width="800" height="600" style="display: none;"></canvas>
+
+    <audio id="laser-sound" src="https://www.zapsplat.com/wp-content/uploads/2015/sound-effects-18146/sci_fi_laser_shot_2.mp3"></audio>
+    <audio id="explosion-sound" src="https://www.zapsplat.com/wp-content/uploads/2015/sound-effects-28653/sci_fi_explosion_01.mp3"></audio>
+    <audio id="game-over-sound" src="https://www.zapsplat.com/wp-content/uploads/2015/sound-effects-35437/multimedia_game_sound_retro_style_game_over_001.mp3"></audio>
+    <audio id="background-music" src="https://www.zapsplat.com/wp-content/uploads/2015/music-6438/zapsplat_music_deep_space.mp3" loop></audio>
+
+    <!-- Javascript game logic -->
     <script src="script.js"></script>
-</body>
+  </body>
 </html>
