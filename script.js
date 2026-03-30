@@ -22,10 +22,76 @@ const easyBtn = document.getElementById("easy-btn");
 const mediumBtn = document.getElementById("medium-btn");
 const hardBtn = document.getElementById("hard-btn");
 
-const laserSound = document.getElementById("laser-sound");
-const explosionSound = document.getElementById("explosion-sound");
-const gameOverSound = document.getElementById("game-over-sound");
-const backgroundMusic = document.getElementById("background-music");
+const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+function playLaser() {
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+    osc.type = 'sawtooth';
+    osc.frequency.setValueAtTime(880, audioCtx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(110, audioCtx.currentTime + 0.2);
+    gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.2);
+    osc.start(audioCtx.currentTime);
+    osc.stop(audioCtx.currentTime + 0.2);
+}
+
+function playExplosion() {
+    const bufferSize = audioCtx.sampleRate * 0.4;
+    const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+    const data = buffer.getChannelData(0);
+    for (let i = 0; i < bufferSize; i++) data[i] = Math.random() * 2 - 1;
+    const source = audioCtx.createBufferSource();
+    source.buffer = buffer;
+    const gain = audioCtx.createGain();
+    gain.gain.setValueAtTime(0.6, audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.4);
+    source.connect(gain);
+    gain.connect(audioCtx.destination);
+    source.start();
+}
+
+function playGameOver() {
+    const notes = [523, 415, 330, 262];
+    notes.forEach((freq, i) => {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.type = 'square';
+        const t = audioCtx.currentTime + i * 0.25;
+        osc.frequency.setValueAtTime(freq, t);
+        gain.gain.setValueAtTime(0.3, t);
+        gain.gain.exponentialRampToValueAtTime(0.001, t + 0.2);
+        osc.start(t);
+        osc.stop(t + 0.25);
+    });
+}
+
+let bgInterval = null;
+const bgNotes = [130, 146, 164, 146];
+let bgNoteIndex = 0;
+function startBackgroundMusic() {
+    bgInterval = setInterval(() => {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(bgNotes[bgNoteIndex % bgNotes.length], audioCtx.currentTime);
+        bgNoteIndex++;
+        gain.gain.setValueAtTime(0.08, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.8);
+        osc.start(audioCtx.currentTime);
+        osc.stop(audioCtx.currentTime + 0.8);
+    }, 900);
+}
+function stopBackgroundMusic() {
+    clearInterval(bgInterval);
+    bgInterval = null;
+}
 
 easyBtn.addEventListener("click", () => startGame("easy"));
 mediumBtn.addEventListener("click", () => startGame("medium"));
@@ -38,7 +104,8 @@ function startGame(level) {
 
     levelSelection.style.display = "none";
     gameScreen.style.display = "block";
-    backgroundMusic.play();
+    audioCtx.resume();
+    startBackgroundMusic();
     textBox.focus();
 
     game.init();
@@ -100,8 +167,8 @@ class Player {
                 this.textbox.value = '';
                 this.matched_time = Date.now();
                 this.score += 1;
-                laserSound.play();
-                explosionSound.play();
+                playLaser();
+                playExplosion();
                 return;
             }
         }
@@ -215,9 +282,8 @@ game.init = function() {
 // Defines a function to stop the game loop
 game.stop = function() {
     clearInterval(game.interval);
-    backgroundMusic.pause();
-    backgroundMusic.currentTime = 0;
-    gameOverSound.play();
+    stopBackgroundMusic();
+    playGameOver();
 }
 
 // Defines a function to restart the game
